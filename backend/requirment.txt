@@ -1,0 +1,111 @@
+
+backend/
+├── src/
+│   │
+│   ├── @types/
+│   │   ├── api.d.ts
+│   │   └── mongo-sanitize.d.ts
+│   │
+│   ├── config/
+│   │   ├── cacheConfig.ts
+│   │   ├── db.ts
+│   │   ├── index.ts
+│   │   ├── redis.ts
+│   │   └── socket.ts
+│   │
+│   ├── helper/
+│   │   ├── cursorPagination.ts
+│   │   ├── redisCache.ts
+│   │   └── senitize.ts
+│   │
+│   ├── middlewares/
+│   │   ├── auth.middleware.ts
+│   │   ├── cacheAsync.ts
+│   │   └── globalError.ts
+|   |  
+│   ├── modules/  
+│   │   │
+│   │   ├── comments/
+│   │   │   ├── review.controller.ts
+│   │   │   ├── review.model.ts
+│   │   │   └── review.routes.ts
+│   │   │
+│   │   ├── issue/
+│   │   │   ├── issue.controller.ts
+│   │   │   ├── issue.model.ts
+│   │   │   └── issue.routes.ts
+│   │   │
+│   │   ├── message/
+│   │   │   ├── message.controller.ts
+│   │   │   ├── message.model.ts
+│   │   │   └── message.routes.ts
+│   │   │
+│   │   ├── stats/
+│   │   │   ├──stats.controller.ts     (It is mainly used for user dashboard, category-admin dashboard & super-admin dashboard.)
+│   │   │   └── stats.routes.ts    (It is mainly used for user dashboard, category-admin dashboard and super-admin dashboard.)
+│   │   │
+│   │   └── user/
+│   │       ├── user.controller.ts
+│   │       ├── user.model.ts
+│   │       ├── user.routes.ts
+│   │       └── user.validation.ts
+│   │
+│   ├── routes/
+│   │   └── index.ts
+│   │
+│   ├── templates/
+│   │   
+│   ├── utils/
+│   │   ├── constants.ts
+│   │   ├── cookie.ts
+│   │   ├── email.ts
+│   │   ├── errorHandler.ts
+│   │   ├── image.ts
+│   │   ├── response.ts
+│   │   ├── token.ts
+│   │   └── UploadImage.ts
+│   │   
+│   ├── app.ts
+│   └── server.ts
+└── package.json
+
+
+
+
+
+ Must Have (অবশ্যই প্রয়োগ করুন):
+
+bcrypt - Password hashing (Salt rounds: 12)
+JWT HS256 - Token authentication
+AES-256-GCM - Sensitive data encryption
+LRU Cache - Redis caching strategy
+Cursor Pagination - Already implemented ✅
+Token Bucket - Rate limiting
+MongoDB Text Index - Full-text search
+Input Sanitization - XSS & NoSQL injection prevention
+
+⚠️ Good to Have (সময় থাকলে):
+
+Levenshtein Distance - Fuzzy search
+Priority Scoring - Issue prioritization
+Quick Sort - In-memory sorting
+
+
+আপনার প্রজেক্টের জন্য **সবচেয়ে নিরাপদ Algorithm Stack:**
+```
+Security Layer:
+├── bcrypt (Password)
+├── JWT HS256 (Authentication)
+├── AES-256-GCM (Data Encryption)
+└── Token Bucket (Rate Limiting)
+
+Performance Layer:
+├── LRU Cache (Redis)
+├── Cursor Pagination
+├── Text Search (MongoDB)
+└── Quick Sort (In-memory)
+
+Validation Layer:
+├── Input Sanitization
+├── XSS Protection
+└── NoSQL Injection Prevention

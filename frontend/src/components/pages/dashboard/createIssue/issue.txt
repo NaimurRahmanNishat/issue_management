@@ -1,0 +1,26 @@
+Create Issue Flow:
+
+
+User selects images
+       ↓
+Store File[] objects in state
+       ↓
+Create preview with URL.createObjectURL()
+       ↓
+On submit: Build FormData
+       ↓
+Append all fields to FormData
+       ↓
+Append File[] as "images"
+       ↓
+Send to Backend via RTK Query
+       ↓
+Backend: Multer receives files
+       ↓
+Backend: Sharp compresses images
+       ↓
+Backend: Upload to Cloudinary
+       ↓
+Backend: Save URLs to MongoDB
+       ↓
+Frontend: Success response

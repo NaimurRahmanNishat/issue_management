@@ -1,0 +1,24 @@
+Edit Profile Flow:
+
+
+User selects avatar/NID
+       ↓
+Store File objects (avatarFile, nidFrontFile, nidBackFile)
+       ↓
+Create previews
+       ↓
+On submit: Build FormData
+       ↓
+Append "avatar" (single file)
+       ↓
+Append "nidPic" (multiple files with same key)
+       ↓
+Send to Backend
+       ↓
+Backend: Multer receives with .fields()
+       ↓
+Backend: Process and upload
+       ↓
+Backend: Delete old images
+       ↓
+Frontend: Redux & localStorage update
