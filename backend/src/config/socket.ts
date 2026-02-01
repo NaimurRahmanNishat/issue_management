@@ -1,5 +1,4 @@
 // src/config/socket.ts
-
 import { Server } from "socket.io";
 import { Server as HTTPServer } from "http";
 import config from "../config";
@@ -33,7 +32,7 @@ export const getIO = () => {
 };
 
 
-// message emission function to category admin
+/* ====================== MESSAGE EMIT FUNCTION TO CATEGORY ADMIN ====================== */
 export const emitToCategoryAdmin = (category: string, event: string, data: any) => {
   const io = getIO();
   const room = `category-admin:${category}`;
@@ -43,7 +42,7 @@ export const emitToCategoryAdmin = (category: string, event: string, data: any) 
 };
 
 
-// Emit unread count update to specific category admin
+/* ====================== UNREAD COUNT EMIT FUNCTION ====================== */
 export const emitUnreadCountUpdate = (category: string, type: 'issue' | 'message', count: number) => {
   const io = getIO();
   
