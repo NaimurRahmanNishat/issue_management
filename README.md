@@ -1,6 +1,9 @@
-# issue_management
+# Issue Management System
 
 ## 🚀 Citizen Driven Issue Reporting & Tracking System (CDIRTS)
+
+<img width="1905" height="941" alt="Screenshot 2026-02-01 191255" src="https://github.com/user-attachments/assets/a64f79d7-43cf-4f9f-bdcd-f6f2bf5c0d0a" />
+
 
 ### Overview
 
