@@ -1,6 +1,4 @@
-# issue_management
-
-## 🚀 Citizen Driven Issue Reporting & Tracking System (CDIRTS)
+# 🚀 Citizen Driven Issue Reporting & Tracking System (CDIRTS)
 
 ### Overview
 
