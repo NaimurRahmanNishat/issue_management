@@ -1,5 +1,4 @@
 // src/modules/stats/stats.controller.ts
-
 import { Request, Response } from "express";
 import { catchAsync } from "../../middleware/catchAsync";
 import { AuthRequest } from "../../middleware/auth.middleware";
@@ -10,7 +9,7 @@ import Review from "../comments/review.model";
 import { getCache, setCache } from "../../helper/redisCache";
 
 
-// 1. User Stats (cached)
+/* ====================== USER STATS ====================== */
 export const userStats = catchAsync(async (req: AuthRequest, res: Response) => {
   const userId = req.user?._id;  
 
@@ -90,7 +89,7 @@ export const userStats = catchAsync(async (req: AuthRequest, res: Response) => {
 });
 
 
-// 2. Super Admin Stats (cached)
+/* ====================== SUPER ADMIN STATS ====================== */
 export const adminStats = catchAsync(async (req: AuthRequest, res: Response) => {
     const userId = req.user?._id;  
   if (!userId) throw new AppError(401, "Authentication required!");
@@ -166,7 +165,7 @@ export const adminStats = catchAsync(async (req: AuthRequest, res: Response) => 
 });
 
 
-// 3. Category Admin Stats (cached) 
+/* ====================== CATEGORY ADMIN STATS ====================== */
 export const categoryAdminStats = catchAsync(async (req: AuthRequest, res: Response) => {
   const userId = req.user?._id;
   if (!userId) throw new AppError(401, "Authentication required!");

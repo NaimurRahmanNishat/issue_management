@@ -1,5 +1,4 @@
 // src/modules/issues/issue.model.ts
-
 import mongoose, { Schema, Document, Types } from "mongoose";
 import "../comments/review.model"; 
 

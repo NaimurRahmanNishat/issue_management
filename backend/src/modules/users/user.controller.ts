@@ -1,5 +1,4 @@
 // src/modules/users/user.controller.ts
-
 import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../middleware/catchAsync";
 import User from "./user.model";
@@ -12,7 +11,7 @@ import { deleteMultipleImagesFromCloudinary, uploadToCloudinary } from "../../ut
 
 
 
-// 8. Edit Profile by ID time complexity: O(n)
+/* ====================== EDIT PROFILE BY ID (COMPLEXITY: O(n)) ====================== */
 export const editProfileById = catchAsync(async (req: AuthRequest, res: Response) => {
   const userId = req.user?._id;
   if (!userId) throw new AppError(401, "Unauthorized");
@@ -119,7 +118,8 @@ export const editProfileById = catchAsync(async (req: AuthRequest, res: Response
   });
 });
 
-// 9. Get User Profile by ID time complexity: O(1)
+
+/* ====================== GET USER PROFILE BY ID (COMPLEXITY: O(1)) ====================== */
 export const getProfileById = catchAsync(async (req: AuthRequest, res: Response) => {
   const userId = req.user?._id;
   if (!userId) throw new AppError(401, "Unauthorized");
@@ -154,7 +154,7 @@ export const getProfileById = catchAsync(async (req: AuthRequest, res: Response)
 });
 
 
-// 10. Get All Users (Cursor Pagination) time complexity: O(n)
+/* ====================== GET ALL USERS (COMPLEXITY: O(n)) ====================== */
 export const getAllUsers = catchAsync(async (req: AuthRequest, res: Response) => {
   const role = req.user?.role;
 
@@ -232,7 +232,7 @@ export const getAllUsers = catchAsync(async (req: AuthRequest, res: Response) =>
 });
 
 
-// 11. Get All Category Admins (Cursor Pagination) time complexity: O(n)
+/* ====================== GET ALL CATEGORY ADMINS (COMPLEXITY: O(n)) ====================== */
 export const getAllCategoryAdmins = catchAsync(async (req: AuthRequest, res: Response) => {
   const role = req.user?.role;
 
@@ -310,7 +310,7 @@ export const getAllCategoryAdmins = catchAsync(async (req: AuthRequest, res: Res
 });
 
 
-// 12. Update Category Admin Role time complexity: O(1)
+/* ====================== UPDATE CATEGORY ADMIN (COMPLEXITY: O(1)) ====================== */
 export const updateCategoryAdminRole = catchAsync(async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
   const { category, division } = req.body;
@@ -352,7 +352,7 @@ export const updateCategoryAdminRole = catchAsync(async (req: AuthRequest, res: 
 });
 
 
-// 13. Delete Category Admin time complexity: O(1)
+/* ====================== DELETE CATEGORY ADMIN (COMPLEXITY: O(1)) ====================== */
 export const deleteCategoryAdminRole = catchAsync(async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
 

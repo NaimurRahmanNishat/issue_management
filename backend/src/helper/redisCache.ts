@@ -14,20 +14,21 @@ export interface InvalidateOptions {
   role?: string | undefined;     
 }
 
-// namespace key
+
+/* ====================== CACHING NAMESPACE KEY ====================== */
 export const namespacedKey = (key: string) => {
   return `${CACHE_PREFIX}${key}`;
 };
 
 
-// set cache from redis
+/* ====================== SET CACHE FROM REDIS ====================== */
 export const setCache = async (key: string, value: any, ttlSeconds = DEFAULT_TTL) => {
   const namespacedKeyValue = namespacedKey(key);
   await redis.set(namespacedKeyValue, JSON.stringify(value), "EX", ttlSeconds);
 };
 
 
-// get cache from redis
+/* ====================== GET CACHE FROM REDIS ====================== */
 export const getCache = async <T = any>(key: string): Promise<T | null> => {
   const namespacedKeyValue = namespacedKey(key);
   const raw = await redis.get(namespacedKeyValue);
@@ -41,20 +42,20 @@ export const getCache = async <T = any>(key: string): Promise<T | null> => {
 };
 
 
-// Delete cache from redis (single key delete)
+/* ====================== DELETE CACHE FROM REDIS (single key) ====================== */
 export const deleteCache = async (key: string): Promise<void> => {
   const namespacedKeyValue = namespacedKey(key);
   await redis.del(namespacedKeyValue);
 };
 
 
-// clear all cache from redis (all key delete)
+/* ====================== DELETE ALL CACHE FROM REDIS ====================== */
 export const clearAllCache = async (): Promise<void> => {
   await redis.flushall();
 };
 
 
-// Clear all cache with pattern ( user clear all caches with pattern user:* )
+/* ====================== CLEAR CACHE WITH PATTERN ====================== */
 export const clearCachePattern = async (pattern: string): Promise<number> => {
   const namespacedPattern = namespacedKey(pattern);
   const keys = await redis.keys(namespacedPattern);
@@ -64,7 +65,7 @@ export const clearCachePattern = async (pattern: string): Promise<number> => {
 };
 
 
-// Pattern-based invalidation using redis scan (Memory efficient)
+/* ====================== INVALIDATE CACHE BY PATTERN (Memory Efficient) ====================== */
 export const invalidateByPattern = async (pattern: string): Promise<number> => {
   let cursor = "0";
   let deleted = 0;
@@ -80,7 +81,8 @@ export const invalidateByPattern = async (pattern: string): Promise<number> => {
   return deleted;
 };
 
-// Main cache invalidation function
+
+/* ====================== INVALIDATE CACHE ====================== */
 export const invalidateCache = async (options: InvalidateOptions): Promise<void> => {
   const patterns: string[] = [];
   console.log(`🔄 Invalidating cache for entity: ${options.entity}`, options);

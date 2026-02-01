@@ -1,8 +1,7 @@
 // src/modules/comments/review.validation.ts
-
 import {z} from "zod";
 
-// 1. create review validation  
+/* ====================== CREATE REVIEW VALIDATION ====================== */
 export const createReviewSchema = z.object({
     body: z.object({
         title: z.string().min(3, "Name must be at least 3 characters long"),

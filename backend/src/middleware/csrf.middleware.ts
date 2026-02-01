@@ -2,6 +2,8 @@
 import { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
 
+
+/* ====================== CSRF MIDDLEWARE ====================== */
 export const csrfProtection = ( req: Request, res: Response, next: NextFunction ) => {
   const csrfCookie = req.cookies?.csrfToken;
   const csrfHeader = req.headers["x-csrf-token"];

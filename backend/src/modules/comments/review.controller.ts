@@ -1,5 +1,4 @@
 // src/modules/comments/review.controller.ts
-
 import { Request, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware";
 import { catchAsync } from "../../middleware/catchAsync";
@@ -11,12 +10,12 @@ import { deleteCache, getCache, invalidateCache, setCache } from "../../helper/r
 import { calculateCursorPagination, createCursorPaginationMeta } from "../../helper/cursorPagination";
 
 
-// 1. Create First Comment on Issue
+/* ====================== CREATE COMMENT ====================== */
 export const createComment = catchAsync(async (req: AuthRequest, res: Response) => {
   const { issueId } = req.params;
   const { comment } = req.body;
 
-  // Validate inputs
+  // ====================== VALIDATION ======================
   if (!issueId) {
     throw new AppError(400, "Issue ID is required!");
   }
@@ -25,27 +24,27 @@ export const createComment = catchAsync(async (req: AuthRequest, res: Response) 
     throw new AppError(400, "Comment must be at least 3 characters long!");
   }
 
-  // Check if issue exists
+  // ====================== CHECK AUTHORIZATION ======================
   const issue = await Issue.findById(issueId);
   if (!issue) {
     throw new AppError(404, "Issue not found!");
   }
 
-  // Create review/comment
+  // ====================== CREATE COMMENT ======================
   const review = await Review.create({
     issue: new Types.ObjectId(issueId),
     author: req.user!._id,
     comment: comment.trim(),
   });
 
-  // Populate author details for response
+  // ====================== POPULATE AUTHOR ======================
   await review.populate("author", "name email avatar");
 
-  // Add review to issue
+  // ====================== ADD REVIEW TO ISSUE ======================
   (issue.reviews as Types.ObjectId[]).push(review._id as Types.ObjectId);
   await issue.save();
 
-  // Invalidate caches
+  // ====================== INVALIDATE CACHES ======================
   await invalidateCache({
     entity: "issue",
     entityId: issueId,
@@ -53,7 +52,7 @@ export const createComment = catchAsync(async (req: AuthRequest, res: Response) 
     role: req.user!.role,
   });
 
-  // Invalidate review caches for this issue
+  // ====================== INVALIDATE REVIEW CACHES ======================
   await deleteCache(`reviews:issue:${issueId}:*`);
 
   res.status(201).json({
@@ -64,25 +63,23 @@ export const createComment = catchAsync(async (req: AuthRequest, res: Response) 
 });
 
 
-// 2. Reply to Comment (Nested Replies Support)
+/* ====================== REPLY TO COMMENT ====================== */
 export const replyToComment = catchAsync(async (req: AuthRequest, res: Response) => {
   const { reviewId } = req.params;
   const { comment, parentReplyId } = req.body;
 
-  // Validate input
+  // ====================== VALIDATION INPUT ======================
   if (!comment || comment.trim().length < 3) {
     throw new AppError(400, "Reply must be at least 3 characters long!");
   }
 
-  // Find the review
-  const review = await Review.findById(reviewId)
-    .populate("author", "name email avatar");
-
+  // ====================== FIND REVIEW ======================
+  const review = await Review.findById(reviewId).populate("author", "name email avatar");
   if (!review) {
     throw new AppError(404, "Review not found!");
   }
 
-  // Create new reply object
+  // ====================== CREATE REPLY ======================
   const newReply: any = {
     _id: new Types.ObjectId(),
     author: req.user!._id,
@@ -92,7 +89,7 @@ export const replyToComment = catchAsync(async (req: AuthRequest, res: Response)
     updatedAt: new Date(),
   };
 
-  // If parentReplyId exists, add as nested reply
+  // ====================== ADD REPLY TO REVIEW ======================
   if (parentReplyId) {
     const addNestedReply = (replies: any[]): boolean => {
       for (let reply of replies) {
@@ -113,17 +110,17 @@ export const replyToComment = catchAsync(async (req: AuthRequest, res: Response)
       throw new AppError(404, "Parent reply not found!");
     }
   } else {
-    // Add as direct reply to review
+    // ====================== ADD REPLY TO REVIEW ======================
     review.replies.push(newReply);
   }
 
-  // Save review with new reply
+  // ====================== SAVE REVIEW AND REPLY ======================
   await review.save();
 
-  // Populate the newly added reply's author
+  // ====================== POPULATE AUTHOR ======================
   await review.populate("replies.author", "name email avatar");
 
-  // Invalidate caches
+  // ====================== INVALIDATE CACHES ======================
   await invalidateCache({
     entity: "issue",
     entityId: review.issue.toString(),
@@ -131,7 +128,7 @@ export const replyToComment = catchAsync(async (req: AuthRequest, res: Response)
     role: req.user!.role,
   });
 
-  // Invalidate review caches
+  // ====================== INVALIDATE REVIEW CACHES ======================
   await deleteCache(`reviews:issue:${review.issue}:*`);
 
   res.status(201).json({
@@ -142,40 +139,36 @@ export const replyToComment = catchAsync(async (req: AuthRequest, res: Response)
 });
 
 
-// 3. Edit a Review or Reply
+/* ====================== EDIT A REVIEW OR REPLY ====================== */
 export const editComment = catchAsync(async (req: AuthRequest, res: Response) => {
   const { reviewId } = req.params;
   const { comment, replyId } = req.body;
 
-  // Validate input
+  // ====================== VALIDATION INPUT ======================
   if (!comment || comment.trim().length < 3) {
     throw new AppError(400, "Comment must be at least 3 characters long!");
   }
 
-  // Find review
-  const review = await Review.findById(reviewId)
-    .populate("author", "name email avatar");
-
+  // ====================== FIND REVIEW ======================
+  const review = await Review.findById(reviewId).populate("author", "name email avatar");
   if (!review) {
     throw new AppError(404, "Review not found!");
   }
 
-  // Edit main review (no replyId)
+  // ====================== EDIT REVIEW ======================
   if (!replyId) {
-    // Check authorization
     if (review.author._id.toString() !== req.user!._id!.toString()) {
       throw new AppError(403, "You are not authorized to edit this review!");
     }
-
     review.comment = comment.trim();
     review.updatedAt = new Date();
   } 
-  // Edit nested reply
+  // ====================== EDIT NESTED REPLY ======================
   else {
     const editNestedReply = (replies: any[]): boolean => {
       for (let reply of replies) {
         if (reply._id.toString() === replyId) {
-          // Check authorization
+          // ====================== CHECK AUTHORIZATION ======================
           if (reply.author.toString() !== req.user!._id!.toString()) {
             throw new AppError(403, "You are not authorized to edit this reply!");
           }
@@ -196,13 +189,13 @@ export const editComment = catchAsync(async (req: AuthRequest, res: Response) =>
     }
   }
 
-  // Save updated review
+  // ====================== SAVE REVIEW ======================
   await review.save();
 
-  // Populate all authors in replies
+  
   await review.populate("replies.author", "name email avatar");
 
-  // Invalidate caches
+  // ====================== INVALIDATE CACHES ======================
   await invalidateCache({
     entity: "issue",
     entityId: review.issue.toString(),
@@ -210,7 +203,7 @@ export const editComment = catchAsync(async (req: AuthRequest, res: Response) =>
     role: req.user!.role,
   });
 
-  // Invalidate review caches
+  // ====================== INVALIDATE REVIEW CACHES ======================
   await deleteCache(`reviews:issue:${review.issue}:*`);
 
   res.status(200).json({
@@ -221,39 +214,36 @@ export const editComment = catchAsync(async (req: AuthRequest, res: Response) =>
 });
 
 
-// 4. Delete Review or Reply
+/* ====================== DELETE A REVIEW OR REPLY ====================== */
 export const deleteComment = catchAsync(async (req: AuthRequest, res: Response) => {
   const { reviewId } = req.params;
   const { replyId } = req.body;
 
-  // Find review
-  const review = await Review.findById(reviewId)
-    .populate("author", "name email avatar");
-
+  // ====================== FIND REVIEW ======================
+  const review = await Review.findById(reviewId).populate("author", "name email avatar");
   if (!review) {
     throw new AppError(404, "Review not found!");
   }
 
-  // Delete entire review (no replyId)
+  // ====================== DELETE REVIEW ======================
   if (!replyId) {
-    // Check authorization
     if (review.author._id.toString() !== req.user!._id!.toString()) {
       throw new AppError(403, "You are not authorized to delete this review!");
     }
 
-    // Store issueId before deletion
+    // ====================== STORE DATA FOR INVALIDATION ======================
     const issueId = review.issue.toString();
     const authorId = review.author._id.toString();
 
-    // Delete review
+    // ====================== DELETE REVIEW ======================
     await Review.findByIdAndDelete(reviewId);
 
-    // Remove review reference from issue
+    // ====================== REMOVE REVIEW FROM ISSUE ======================
     await Issue.findByIdAndUpdate(issueId, { 
       $pull: { reviews: review._id } 
     });
 
-    // Invalidate caches
+    // ====================== INVALIDATE CACHES ======================
     await invalidateCache({
       entity: "issue",
       entityId: issueId,
@@ -261,7 +251,7 @@ export const deleteComment = catchAsync(async (req: AuthRequest, res: Response) 
       role: req.user!.role,
     });
 
-    // Invalidate review caches
+    // ====================== INVALIDATE REVIEW CACHES ======================
     await deleteCache(`reviews:issue:${issueId}:*`);
 
     return res.status(200).json({
@@ -314,7 +304,7 @@ export const deleteComment = catchAsync(async (req: AuthRequest, res: Response) 
 });
 
 
-// 5. Get All Comments for Admin (Cursor Pagination)
+/* ====================== GET ALL COMMENTS FOR ADMIN ====================== */
 export const getAllCommentsForAdmin = catchAsync(async (req: AuthRequest, res: Response) => {
   const user = req.user!;
 
@@ -405,7 +395,7 @@ export const getAllCommentsForAdmin = catchAsync(async (req: AuthRequest, res: R
 });
 
 
-// 6. Get Comments by Issue ID (Cursor Pagination)
+/* ====================== GET COMMENTS BY ISSUE ====================== */
 export const getCommentsByIssue = catchAsync(async (req: Request, res: Response) => {
   const { issueId } = req.params;
   const { cursor, limit = 10, sortOrder = "desc" } = req.query;
@@ -475,7 +465,7 @@ export const getCommentsByIssue = catchAsync(async (req: Request, res: Response)
 });
 
 
-// 7. Get Single Review by ID
+/* ====================== GET SINGLE REVIEW ====================== */
 export const getReviewById = catchAsync(async (req: Request, res: Response) => {
   const { reviewId } = req.params;
 
@@ -525,7 +515,7 @@ export const getReviewById = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-// 8. Get Reviews by User ID (Cursor Pagination)
+/* ====================== GET REVIEWS BY USER ====================== */
 export const getReviewsByUser = catchAsync(async (req: AuthRequest, res: Response) => {
   const { userId } = req.params;
   const { cursor, limit = 10, sortOrder = "desc" } = req.query;

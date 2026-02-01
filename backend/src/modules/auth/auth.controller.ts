@@ -1,4 +1,4 @@
-
+// src/modules/auth/auth.controller.ts
 import { Request, Response } from "express";
 import { catchAsync } from "../../middleware/catchAsync";
 import { AuthRequest } from "../../middleware/auth.middleware";
@@ -7,13 +7,13 @@ import { AppError } from "../../utils/errorHandler";
 import User, { emailRegex } from "../users/user.model";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-import { redis } from "../../config/redis";
 import { sendActivationEmail } from "../../utils/email";
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../../utils/token";
 import { clearAuthCookies, setAuthCookies } from "../../utils/cookie";
 
 
-// 1. Register User time complexity: O(1)
+
+/* ====================== REGISTER USER CONTROLLER (COMPLEXITY: O(1)) ====================== */
 export const register = catchAsync(async (req: AuthRequest, res: Response) => {
   const body = sanitizeBody(req.body);
   const { name, email, password, confirmPassword, phone, nid, category } = body;
@@ -26,7 +26,7 @@ export const register = catchAsync(async (req: AuthRequest, res: Response) => {
     throw new AppError(400, "Passwords do not match!");
   }
 
-  // Duplicate check
+  // ================= CHECK IF USER ALREADY EXISTS =================
   const exists = await User.findOne({
     $or: [{ email }, { phone }, { nid }],
   });
@@ -102,7 +102,7 @@ export const register = catchAsync(async (req: AuthRequest, res: Response) => {
 });
 
 
-// 2. Activate User Account time complexity: O(1)
+/* ====================== ACTIVATE USER ACCOUNT (COMPLEXITY: O(1)) ====================== */
 export const activateUser = catchAsync(async (req: Request, res: Response) => {
   const body = sanitizeBody(req.body);
   const { email, activationCode } = body;
@@ -148,12 +148,12 @@ export const activateUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-// 3. Login User time complexity: O(1)
+/* ====================== LOGIN USER (COMPLEXITY: O(1)) ====================== */
 export const login = catchAsync(async (req: Request, res: Response) => {
   const body = sanitizeBody(req.body);
   const { email, password } = body as any;
 
-  // Validation
+  // ================ VALIDATION =================
   if (!email || !emailRegex.test(email)) {
     throw new AppError(400, "Please provide a valid email!");
   }
@@ -167,19 +167,19 @@ export const login = catchAsync(async (req: Request, res: Response) => {
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) throw new AppError(401, "Invalid password!");
 
-  // Check if user is verified
+  // ================ CHECK USER VERIFICATION =================
   if (!user.isVerified) {
     throw new AppError(403, "Please verify your email before logging in!");
   }
 
-  // Generate tokens
+  // ================ TOKEN GENERATION =================
   const accessToken = generateAccessToken({ id: user._id!.toString(), role: user.role });
   const refreshToken = generateRefreshToken({ id: user._id!.toString(), role: user.role });
 
-  // Set cookies
+  // ================= SET COOKIES =================
   setAuthCookies(res, accessToken, refreshToken);
 
-  // Prepare safe user data
+  // ================= SAFE USER OBJECT =================
   const safeUser = {
     _id: user._id!.toString(),
     name: user.name,
@@ -201,13 +201,11 @@ export const login = catchAsync(async (req: Request, res: Response) => {
   data: {
     user: safeUser,
     accessToken,
-  },
+  }});
 });
 
-});
 
-
-// 4. Refresh Access Token time complexity: O(1)
+/* ====================== REFRESH TOKEN (COMPLEXITY: O(1)) ====================== */
 export const refreshToken = catchAsync(async (req: Request, res: Response) => {
   const refreshTokenFromCookie = req.cookies?.refreshToken;
 
@@ -266,10 +264,10 @@ export const refreshToken = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-// 5. Logout User time complexity: O(1)
+/* ====================== LOGOUT USER (COMPLEXITY: O(1)) ====================== */
 export const logout = catchAsync(async (req: Request, res: Response) => {
 
-  // Clear cookies
+  // ================ CLEAR COOKIES =================
   await clearAuthCookies(res);
 
   res.status(200).json({
@@ -279,7 +277,7 @@ export const logout = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-// 6. Forget Password (OTP Based) time complexity: O(1)
+/* ====================== FORGET PASSWORD (COMPLEXITY: O(1)) ====================== */
 export const forgetPassword = catchAsync(async (req: Request, res: Response) => {
   const { email } = sanitizeBody(req.body) as any;
 
@@ -288,10 +286,10 @@ export const forgetPassword = catchAsync(async (req: Request, res: Response) => 
   const user = await User.findOne({ email });
   if (!user) throw new AppError(404, "User not found!");
 
-  // Generate 6-digit OTP
+  // ================ OTP GENERATION =================
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-  // Hash OTP before saving
+  // ================ OTP HASHING =================
   const hashedOtp = crypto.createHash("sha256").update(otp).digest("hex");
 
   user.resetPasswordOtp = hashedOtp;
@@ -317,7 +315,8 @@ export const forgetPassword = catchAsync(async (req: Request, res: Response) => 
   });
 });
 
-// 7. Reset Password time complexity: O(1)
+
+/* ====================== RESET PASSWORD (COMPLEXITY: O(1)) ====================== */
 export const resetPassword = catchAsync(async (req: Request, res: Response) => {
   const { otp, newPassword } = sanitizeBody(req.body) as any;
 
@@ -333,14 +332,13 @@ export const resetPassword = catchAsync(async (req: Request, res: Response) => {
 
   if (!user) throw new AppError(400, "Invalid or expired OTP!");
 
-  // Hash new password
+  // ================ PASSWORD HASHING =================
   user.password = await bcrypt.hash(newPassword, 12);
   user.resetPasswordOtp = null;
   user.resetPasswordOtpExpiry = null;
 
-  // Invalidate refresh tokens (clear cookies)
+  // =============== CLEAR COOKIES =================
   await clearAuthCookies(res);
-
   await user.save();
 
   res.status(200).json({

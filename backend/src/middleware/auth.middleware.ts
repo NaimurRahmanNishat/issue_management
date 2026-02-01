@@ -19,7 +19,7 @@ export interface AuthRequest extends Request {
 
 type JwtAccessPayload = { id: string; role: string; email?: string; category?: string; };
 
-// Authentication middleware
+/* ====================== AUTHENTICATION MIDDLEWARE ====================== */
 export const isAuthenticated = async ( req: AuthRequest, res: Response, next: NextFunction ) => {
   const token = req.cookies?.accessToken || req.headers.authorization?.split("Bearer ")[1];
   if (!token) return next(new AppError(401, "Access token missing"));
@@ -37,7 +37,8 @@ export const isAuthenticated = async ( req: AuthRequest, res: Response, next: Ne
   }
 };
 
-// Authorization middleware
+
+/* ====================== AUTHORIZATION MIDDLEWARE ====================== */
 export const authorizeRole = (...roles: string[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {
@@ -47,7 +48,8 @@ export const authorizeRole = (...roles: string[]) => {
   };
 };
 
-// Optional authentication middleware
+
+/* ====================== OPTIONAL AUTHENTICATION MIDDLEWARE ====================== */
 export const optionalAuth = async ( req: AuthRequest, res: Response, next: NextFunction ) => {
   const token = req.cookies?.accessToken;
   if (!token) return next(); // no token, skip silently (public access)
@@ -58,7 +60,7 @@ export const optionalAuth = async ( req: AuthRequest, res: Response, next: NextF
     };
     let user = await getCache(`user:${decoded.id}`);
     if (!user) {
-      const userDoc = await User.findById(decoded.id).select("-password");
+      const userDoc = await User.findById(decoded.id).select("-password -refreshToken -refreshTokenExpiry -activationCode -activationCodeExpiry -resetPasswordOtp -resetPasswordOtpExpiry").lean();
       if (userDoc) {
         user = userDoc.toObject();
         await setCache(`user:${decoded.id}`, user);

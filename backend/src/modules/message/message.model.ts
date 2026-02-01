@@ -1,5 +1,4 @@
 // src/modules/message/message.model.ts
-
 import mongoose, { Schema, Document, Types } from "mongoose";
 
 export enum CategoryType {

@@ -14,6 +14,8 @@ export interface ICursorPaginationResult {
     filter: any;
 }
 
+
+/* ====================== CURSOR PAGINATION ====================== */
 export const calculateCursorPagination = (options: ICursorPaginationOptions): ICursorPaginationResult => {
     const limit = options.limit && options.limit > 0 ? options.limit : 10;
     const sortBy = options.sortBy || 'createdAt';
@@ -50,6 +52,8 @@ export interface ICursorPaginationMeta<T> {
     sortOrder: "asc" | "desc";
 }
 
+
+/* ====================== CREATE CURSOR PAGINATION ====================== */
 export const createCursorPaginationMeta = <T extends Record<string, any>>(
     data: T[],
     limit: number,

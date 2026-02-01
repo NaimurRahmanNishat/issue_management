@@ -1,5 +1,4 @@
 // src/modules/users/user.model.ts
-
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 

@@ -1,8 +1,7 @@
 // src/modules/auth/auth.validation.ts
-
 import {z} from "zod";
 
-// 1. register user validation
+/* ====================== REGISTER USER VALIDATION ====================== */
 export const registerUserSchema = z.object({
     body: z.object({
         name: z.string().min(3, "Name must be at least 3 characters long"),
@@ -23,7 +22,7 @@ export const registerUserSchema = z.object({
 });
 
 
-// 2. activate user validation
+/* ====================== ACTIVATE USER VALIDATION ====================== */
 export const activateUserSchema = z.object({
     body: z.object({
         email: z.string().email("Invalid email format"),
@@ -32,7 +31,7 @@ export const activateUserSchema = z.object({
 });
 
 
-// 3. login user validation
+/* ====================== LOGIN USER VALIDATION ====================== */
 export const loginUserSchema = z.object({
     body: z.object({
         email: z.string().email("Invalid email format"),

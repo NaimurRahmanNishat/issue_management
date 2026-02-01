@@ -1,8 +1,7 @@
 // src/modules/issues/issue.validation.ts
-
 import {z} from "zod";
 
-// 1. create issue validation
+/* ====================== CREATE ISSUE VALIDATION ====================== */
 export const createIssueSchema = z.object({
     body: z.object({
         title: z.string().min(3, "Name must be at least 3 characters long"),

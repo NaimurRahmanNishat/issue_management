@@ -1,3 +1,4 @@
+// src/modules/message/message.controller.ts
 import { Request, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware";
 import { catchAsync } from "../../middleware/catchAsync";
@@ -7,8 +8,7 @@ import { emitToCategoryAdmin, emitUnreadCountUpdate } from "../../config/socket"
 import { calculateCursorPagination, createCursorPaginationMeta } from "../../helper/cursorPagination";
 
 
-
-// 1. Send Message (User → Category Admin)
+/* ====================== EMERGENCY MESSAGE SEND (User → Category Admin) ====================== */
 export const snedMessage = catchAsync(async (req: AuthRequest, res: Response) => {
   const user = req.user!;
   const { message, category } = req.body;
@@ -65,7 +65,7 @@ export const snedMessage = catchAsync(async (req: AuthRequest, res: Response) =>
 });
 
 
-// 2. Get All Messages (with Cursor Pagination)
+/* ====================== GET ALL MESSAGES ====================== */
 export const getAllMessagesReceived = catchAsync(async (req: AuthRequest, res: Response) => {
   const user = req.user!;
   
@@ -136,7 +136,7 @@ export const getAllMessagesReceived = catchAsync(async (req: AuthRequest, res: R
 });
 
 
-// 3. Update Message by ID
+/* ====================== UPDATE MESSAGE ====================== */
 export const updateMessageById = catchAsync(async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
   const user = req.user!;
@@ -197,7 +197,7 @@ export const updateMessageById = catchAsync(async (req: AuthRequest, res: Respon
 });
 
 
-// 4. Delete Message by ID
+/* ====================== DELETE MESSAGE ====================== */
 export const deleteMessage = catchAsync(async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
   const user = req.user!;
@@ -229,7 +229,7 @@ export const deleteMessage = catchAsync(async (req: AuthRequest, res: Response) 
 });
 
 
-// 5. Get Unread Messages Count (Admin Only)
+/* ====================== GET UNREAD MESSAGES COUNT ====================== */
 export const getUnreadMessagesCount = catchAsync(async (req: AuthRequest, res: Response) => {
   const user = req.user!;
 
@@ -258,7 +258,7 @@ export const getUnreadMessagesCount = catchAsync(async (req: AuthRequest, res: R
 });
 
 
-// 6. Mark Single Message as Read (Admin Only)
+/* ====================== MARK MESSAGE AS READ ====================== */
 export const markMessageAsReadByAdmin = catchAsync(async (req: AuthRequest, res: Response) => {
   const { messageId } = req.params;
   const user = req.user!;
@@ -300,7 +300,7 @@ export const markMessageAsReadByAdmin = catchAsync(async (req: AuthRequest, res:
 });
 
 
-// 7. Mark All Messages as Read (Admin Only)
+/* ====================== MARK ALL MESSAGES AS READ ====================== */
 export const markAllMessagesAsReadByAdmin = catchAsync(async (req: AuthRequest, res: Response) => {
   const user = req.user!;
 
@@ -333,4 +333,3 @@ export const markAllMessagesAsReadByAdmin = catchAsync(async (req: AuthRequest, 
     modifiedCount: result.modifiedCount,
   });
 });
-

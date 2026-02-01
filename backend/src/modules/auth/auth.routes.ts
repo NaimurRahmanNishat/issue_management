@@ -1,3 +1,4 @@
+// src/modules/auth/auth.routes.ts
 import { Router } from "express";
 import { activateUser, forgetPassword, login, logout, refreshToken, register, resetPassword } from "./auth.controller";
 import { validate } from "../../middleware/validate.middleware";
@@ -9,27 +10,25 @@ import { csrfProtection } from "../../middleware/csrf.middleware";
 
 const router = Router();
 
-// ==================== Public Routes ====================
-
-// 1. Register (public for regular users, authenticated for category-admin creation)
+/* ====================== REGISTER USER ====================== */
 router.post("/register", optionalAuth,  validate(registerUserSchema), register);
 
-// 2. Activate user account
+/* ====================== AUTHENTICATE USER ====================== */
 router.post("/activate", validate(activateUserSchema), activateUser);
 
-// 3. Login
+/* ====================== LOGIN USER ====================== */
 router.post("/login", authLimiter, validate(loginUserSchema), login);
 
-// 4. Refresh access token
+/* ====================== REFRESH TOKEN ====================== */
 router.post("/refresh-token", csrfProtection, refreshToken);
 
-// 5. Logout (requires authentication)
+/* ====================== LOGOUT ====================== */
 router.post("/logout", isAuthenticated, logout);
 
-// 5. Forgot password (send OTP)
+/* ====================== FORGOT PASSWORD ====================== */
 router.post("/forgot-password", forgetPassword);
 
-// 5. Reset password (verify OTP and set new password)
+/* ====================== RESET PASSWORD ====================== */
 router.post("/reset-password", resetPassword);
 
 export const authRoutes = router; 

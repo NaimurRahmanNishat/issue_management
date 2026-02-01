@@ -1,5 +1,4 @@
 // src/modules/issues/issue.controller.ts
-
 import { Request, Response } from "express";
 import { catchAsync } from "../../middleware/catchAsync";
 import { AuthRequest } from "../../middleware/auth.middleware";
@@ -14,7 +13,7 @@ import sharp from "sharp";
 import { uploadToCloudinary } from "../../utils/uploadToCloudinary";
 
 
-// 1. Create Issue with Real-time Notification
+/* ====================== CREATE ISSUE WITH REAL-TIME NOTIFICATION ====================== */
 export const createIssue = catchAsync(async (req: AuthRequest, res: Response) => {
   const { title, category, description, location, division, date } = req.body;
 
@@ -127,7 +126,7 @@ export const createIssue = catchAsync(async (req: AuthRequest, res: Response) =>
 });
 
 
-// 2. Get All Issues with Filters & Pagination
+/* ====================== GET ALL ISSUES WITH FILTERS & PAGINATION ====================== */
 export const getAllIssues = catchAsync(async (req: AuthRequest, res: Response) => {
   const user = req.user!;
   const { cursor, limit = 10, sortOrder = "desc", status, division, category, search } = req.query;
@@ -203,7 +202,7 @@ export const getAllIssues = catchAsync(async (req: AuthRequest, res: Response) =
 });
 
 
-// 3. Get Issue by ID (with Details)
+/* ====================== GET ISSUE BY ID ====================== */
 export const getIssueById = catchAsync(async (req: AuthRequest, res: Response) => {
   const { issueId } = req.params;
 
@@ -251,7 +250,7 @@ export const getIssueById = catchAsync(async (req: AuthRequest, res: Response) =
 });
 
 
-// 4. Update Issue Status (Admin Only)
+/* ====================== UPDATE ISSUE STATUS ====================== */
 export const updateIssueById = catchAsync(async (req: AuthRequest, res: Response) => {
   const { issueId } = req.params;
   const { status } = req.body;
@@ -328,7 +327,7 @@ export const updateIssueById = catchAsync(async (req: AuthRequest, res: Response
 });
 
 
-// 5. Delete Issue by ID (Admin Only)
+/* ====================== DELETE ISSUE ====================== */
 export const deleteIssueById = catchAsync(async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
   const user = req.user!;
@@ -390,7 +389,7 @@ export const deleteIssueById = catchAsync(async (req: AuthRequest, res: Response
 });
 
 
-// 6. Get Issues by User ID (User Dashboard)
+/* ====================== GET ISSUES BY USER ID (User Dashboard) ====================== */
 export const getIssueByUser = catchAsync(async (req: AuthRequest, res: Response) => {
   const { userId } = req.params;
   const currentUser = req.user!;
@@ -484,7 +483,7 @@ export const getIssueByUser = catchAsync(async (req: AuthRequest, res: Response)
 });
 
 
-// 7. Get Unread Issues Count (Admin Only)
+/* ====================== GET UNREAD ISSUES COUNT ====================== */
 export const getUnreadIssuesCount = catchAsync(async (req: AuthRequest, res: Response) => {
   const user = req.user!;
 
@@ -535,7 +534,7 @@ export const getUnreadIssuesCount = catchAsync(async (req: AuthRequest, res: Res
 });
 
 
-// 8. Mark Single Issue as Read (Admin Only)
+/* ====================== MARK SINGLE ISSUE AS READ ====================== */
 export const markIssueAsRead = catchAsync(async (req: AuthRequest, res: Response) => {
   const { issueId } = req.params;
   const user = req.user!;
@@ -604,7 +603,7 @@ export const markIssueAsRead = catchAsync(async (req: AuthRequest, res: Response
 });
 
 
-// 9. Mark All Issues as Read (Admin Only)
+/* ====================== MARK ALL ISSUES AS READ ====================== */
 export const markAllIssuesAsRead = catchAsync(async (req: AuthRequest, res: Response) => {
   const user = req.user!;
 
